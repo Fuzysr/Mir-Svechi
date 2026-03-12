@@ -41,6 +41,7 @@
    - Все хуки в `src/hooks/`
    - Все макеты в `src/layouts/`
    - Все ассеты в `src/assets/`
+   - Роутинг (React-router, react-router-dom)
 
 
 2. **Следуй код-стайлу**
