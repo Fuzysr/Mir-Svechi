@@ -1,21 +1,27 @@
 import { useState, useMemo, memo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiShoppingCart, FiChevronRight, FiStar, FiPackage, FiClock, FiDroplet, FiWind } from 'react-icons/fi';
+import { FiShoppingCart, FiChevronRight, FiMinus, FiPlus, FiPackage, FiClock, FiDroplet, FiWind } from 'react-icons/fi';
 import { products } from '../../services/mockData';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import type { Product } from '../../types';
 import styles from './ProductDetail.module.css';
 
 interface ProductDetailProps {
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, quantity: number) => void;
+}
+
+function formatTierRange(tier: Product['wholesaleTiers'][number]): string {
+  if (tier.maxQuantity) {
+    return `${tier.minQuantity}–${tier.maxQuantity} шт.`;
+  }
+  return `от ${tier.minQuantity} шт.`;
 }
 
 const ProductDetail = memo(function ProductDetail({ onAddToCart }: ProductDetailProps) {
   const { id } = useParams<{ id: string }>();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [isWholesale, setIsWholesale] = useState(false);
 
   const product = useMemo(() => products.find(p => p.id === id), [id]);
 
@@ -30,7 +36,6 @@ const ProductDetail = memo(function ProductDetail({ onAddToCart }: ProductDetail
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setSelectedImage(0);
     setQuantity(1);
-    setIsWholesale(false);
   }, [id]);
 
   if (!product) {
@@ -43,8 +48,6 @@ const ProductDetail = memo(function ProductDetail({ onAddToCart }: ProductDetail
       </div>
     );
   }
-
-  const currentPrice = isWholesale && product.wholesalePrice ? product.wholesalePrice : product.price;
 
   return (
     <div className={styles.page}>
@@ -94,14 +97,9 @@ const ProductDetail = memo(function ProductDetail({ onAddToCart }: ProductDetail
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
+            <span className={styles.article}>Артикул: {product.article}</span>
             <span className={styles.category}>{product.category}</span>
             <h1 className={styles.name}>{product.name}</h1>
-
-            <div className={styles.rating}>
-              <FiStar size={16} className={styles.starIcon} />
-              <span className={styles.ratingValue}>{product.rating}</span>
-              <span className={styles.reviewsCount}>{product.reviewsCount} отзывов</span>
-            </div>
 
             <p className={styles.description}>{product.description}</p>
 
@@ -148,46 +146,33 @@ const ProductDetail = memo(function ProductDetail({ onAddToCart }: ProductDetail
             </div>
 
             <div className={styles.priceSection}>
-              <div className={styles.priceToggle}>
-                <button
-                  className={`${styles.priceTab} ${!isWholesale ? styles.priceTabActive : ''}`}
-                  onClick={() => setIsWholesale(false)}
-                >
-                  Розница
-                </button>
-                {product.wholesalePrice && (
-                  <button
-                    className={`${styles.priceTab} ${isWholesale ? styles.priceTabActive : ''}`}
-                    onClick={() => setIsWholesale(true)}
-                  >
-                    Опт
-                  </button>
-                )}
-              </div>
-              <div className={styles.priceDisplay}>
-                <span className={styles.currentPrice}>{currentPrice} &#8381;</span>
-                {isWholesale && product.wholesaleMinQuantity && (
-                  <span className={styles.minQty}>от {product.wholesaleMinQuantity} шт.</span>
-                )}
+              <h3 className={styles.priceTitle}>Оптовые цены</h3>
+              <div className={styles.tiersTable}>
+                {product.wholesaleTiers.map((tier, i) => (
+                  <div key={i} className={styles.tierRow}>
+                    <span className={styles.tierRange}>{formatTierRange(tier)}</span>
+                    <span className={styles.tierPrice}>{tier.price} &#8381;/шт.</span>
+                  </div>
+                ))}
               </div>
             </div>
 
             <div className={styles.addToCart}>
               <div className={styles.quantityControl}>
-                <button onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
+                <button onClick={() => setQuantity(q => Math.max(1, q - 1))}>
+                  <FiMinus size={16} />
+                </button>
                 <span>{quantity}</span>
-                <button onClick={() => setQuantity(q => q + 1)}>+</button>
+                <button onClick={() => setQuantity(q => q + 1)}>
+                  <FiPlus size={16} />
+                </button>
               </div>
               <button
                 className={`btn btn-primary ${styles.addBtn}`}
-                onClick={() => {
-                  for (let i = 0; i < quantity; i++) {
-                    onAddToCart(product);
-                  }
-                }}
+                onClick={() => onAddToCart(product, quantity)}
               >
                 <FiShoppingCart size={18} />
-                В корзину — {currentPrice * quantity} &#8381;
+                В корзину
               </button>
             </div>
 

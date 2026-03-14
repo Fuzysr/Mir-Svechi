@@ -6,7 +6,7 @@ import type { Product } from '../../../types';
 import styles from './HitsSection.module.css';
 
 interface HitsSectionProps {
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, quantity: number) => void;
 }
 
 const HitsSection = memo(function HitsSection({ onAddToCart }: HitsSectionProps) {

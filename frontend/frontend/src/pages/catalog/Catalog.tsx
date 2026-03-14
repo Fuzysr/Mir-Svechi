@@ -8,7 +8,7 @@ import type { Product } from '../../types';
 import styles from './Catalog.module.css';
 
 interface CatalogProps {
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, quantity: number) => void;
 }
 
 const sortOptions = [
@@ -89,7 +89,7 @@ const Catalog = memo(function Catalog({ onAddToCart }: CatalogProps) {
         result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         break;
       default:
-        result.sort((a, b) => b.reviewsCount - a.reviewsCount);
+        result.sort((a, b) => Number(b.isHit) - Number(a.isHit));
     }
 
     return result;

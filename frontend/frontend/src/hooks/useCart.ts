@@ -16,40 +16,50 @@ function saveCart(items: CartItem[]) {
   localStorage.setItem(CART_KEY, JSON.stringify(items));
 }
 
+function getPriceForQuantity(product: Product, quantity: number): number {
+  if (product.wholesaleTiers.length === 0) return product.price;
+  for (let i = product.wholesaleTiers.length - 1; i >= 0; i--) {
+    if (quantity >= product.wholesaleTiers[i].minQuantity) {
+      return product.wholesaleTiers[i].price;
+    }
+  }
+  return product.price;
+}
+
 export function useCart() {
   const [items, setItems] = useState<CartItem[]>(loadCart);
 
-  const addItem = useCallback((product: Product, quantity: number = 1, isWholesale: boolean = false) => {
+  const addItem = useCallback((product: Product, quantity: number = 1) => {
     setItems(prev => {
-      const existing = prev.find(item => item.product.id === product.id && item.isWholesale === isWholesale);
+      const existing = prev.find(item => item.product.id === product.id);
       let next: CartItem[];
       if (existing) {
         next = prev.map(item =>
-          item.product.id === product.id && item.isWholesale === isWholesale
+          item.product.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       } else {
-        next = [...prev, { product, quantity, isWholesale }];
+        next = [...prev, { product, quantity }];
       }
       saveCart(next);
       return next;
     });
   }, []);
 
-  const removeItem = useCallback((productId: string, isWholesale: boolean = false) => {
+  const removeItem = useCallback((productId: string) => {
     setItems(prev => {
-      const next = prev.filter(item => !(item.product.id === productId && item.isWholesale === isWholesale));
+      const next = prev.filter(item => item.product.id !== productId);
       saveCart(next);
       return next;
     });
   }, []);
 
-  const updateQuantity = useCallback((productId: string, quantity: number, isWholesale: boolean = false) => {
+  const updateQuantity = useCallback((productId: string, quantity: number) => {
     if (quantity < 1) return;
     setItems(prev => {
       const next = prev.map(item =>
-        item.product.id === productId && item.isWholesale === isWholesale
+        item.product.id === productId
           ? { ...item, quantity }
           : item
       );
@@ -67,13 +77,11 @@ export function useCart() {
 
   const totalPrice = useMemo(() =>
     items.reduce((sum, item) => {
-      const price = item.isWholesale && item.product.wholesalePrice
-        ? item.product.wholesalePrice
-        : item.product.price;
+      const price = getPriceForQuantity(item.product, item.quantity);
       return sum + price * item.quantity;
     }, 0),
     [items]
   );
 
-  return { items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice };
+  return { items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice, getPriceForQuantity };
 }

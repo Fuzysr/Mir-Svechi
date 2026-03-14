@@ -9,8 +9,8 @@ interface CartProps {
   items: CartItemType[];
   totalPrice: number;
   user: User | null;
-  onUpdateQuantity: (productId: string, quantity: number, isWholesale: boolean) => void;
-  onRemoveItem: (productId: string, isWholesale: boolean) => void;
+  onUpdateQuantity: (productId: string, quantity: number) => void;
+  onRemoveItem: (productId: string) => void;
   onClearCart: () => void;
   onAuthClick: () => void;
 }
@@ -100,7 +100,7 @@ const Cart = memo(function Cart({
             <AnimatePresence>
               {items.map(item => (
                 <motion.div
-                  key={`${item.product.id}-${item.isWholesale}`}
+                  key={item.product.id}
                   className={styles.item}
                   layout
                   initial={{ opacity: 0, x: -20 }}
@@ -118,28 +118,27 @@ const Cart = memo(function Cart({
                     </Link>
                     <span className={styles.itemCategory}>
                       {item.product.category}
-                      {item.isWholesale && <span className={styles.wholesaleBadge}>Опт</span>}
                     </span>
                   </div>
 
                   <div className={styles.itemQuantity}>
-                    <button onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1, item.isWholesale)}>-</button>
+                    <button onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1)}>-</button>
                     <span>{item.quantity}</span>
-                    <button onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1, item.isWholesale)}>+</button>
+                    <button onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1)}>+</button>
                   </div>
 
                   <div className={styles.itemPrice}>
                     <span className={styles.itemTotal}>
-                      {((item.isWholesale && item.product.wholesalePrice ? item.product.wholesalePrice : item.product.price) * item.quantity)} &#8381;
+                      {item.product.price * item.quantity} &#8381;
                     </span>
                     <span className={styles.itemUnit}>
-                      {item.isWholesale && item.product.wholesalePrice ? item.product.wholesalePrice : item.product.price} &#8381;/шт
+                      {item.product.price} &#8381;/шт
                     </span>
                   </div>
 
                   <button
                     className={styles.removeBtn}
-                    onClick={() => onRemoveItem(item.product.id, item.isWholesale)}
+                    onClick={() => onRemoveItem(item.product.id)}
                     aria-label="Удалить"
                   >
                     <FiTrash2 size={16} />

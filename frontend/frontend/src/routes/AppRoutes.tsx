@@ -1,32 +1,32 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import type { Product, CartItem, User } from '../types';
 
-import Home from '../pages/Home/Home';
-import Catalog from '../pages/Catalog/Catalog';
+import Home from '../pages/home/Home';
+import Catalog from '../pages/catalog/Catalog';
 import ProductDetail from '../pages/ProductDetail/ProductDetail';
-import Cart from '../pages/Cart/Cart';
-import Contacts from '../pages/Contacts/Contacts';
-import Gallery from '../pages/Gallery/Gallery';
-import About from '../pages/About/About';
-import Clients from '../pages/Clients/Clients';
-import Cooperation from '../pages/Clients/components/Cooperation';
-import Payment from '../pages/Clients/components/Payment';
-import Delivery from '../pages/Clients/components/Delivery';
-import Files from '../pages/Clients/components/Files';
-import Admin from '../pages/Admin/Admin';
-import AdminOrders from '../pages/Admin/components/AdminOrders';
-import AdminProducts from '../pages/Admin/components/AdminProducts';
-import AdminCategories from '../pages/Admin/components/AdminCategories';
-import AdminUsers from '../pages/Admin/components/AdminUsers';
-import AdminSettings from '../pages/Admin/components/AdminSettings';
+import Cart from '../pages/cart/Cart';
+import Contacts from '../pages/contacts/Contacts';
+import Gallery from '../pages/gallery/Gallery';
+import About from '../pages/about/About';
+import Clients from '../pages/clients/Clients';
+import Cooperation from '../pages/clients/components/Cooperation';
+import Payment from '../pages/clients/components/Payment';
+import Delivery from '../pages/clients/components/Delivery';
+import Files from '../pages/clients/components/Files';
+import Admin from '../pages/admin/Admin';
+import AdminOrders from '../pages/admin/components/AdminOrders';
+import AdminProducts from '../pages/admin/components/AdminProducts';
+import AdminCategories from '../pages/admin/components/AdminCategories';
+import AdminUsers from '../pages/admin/components/AdminUsers';
+import AdminSettings from '../pages/admin/components/AdminSettings';
 
 interface AppRoutesProps {
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, quantity: number) => void;
   cartItems: CartItem[];
   cartTotalPrice: number;
   user: User | null;
-  onUpdateQuantity: (productId: string, quantity: number, isWholesale: boolean) => void;
-  onRemoveItem: (productId: string, isWholesale: boolean) => void;
+  onUpdateQuantity: (productId: string, quantity: number) => void;
+  onRemoveItem: (productId: string) => void;
   onClearCart: () => void;
   onAuthClick: () => void;
 }

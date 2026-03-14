@@ -1,8 +1,8 @@
+/* ── Hero container ── */
 .hero {
   position: relative;
-  height: 85vh;
+  height: 120vh;
   min-height: 500px;
-  max-height: 800px;
   overflow: hidden;
 }
 
@@ -11,6 +11,7 @@
   inset: 0;
 }
 
+/* ── Background image ── */
 .imageBg {
   position: absolute;
   inset: 0;
@@ -22,118 +23,137 @@
   object-fit: cover;
 }
 
+/* ── Main gradient overlay ── */
 .overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(70, 62, 49, 0.7) 0%,
-    rgba(70, 62, 49, 0.4) 50%,
-    rgba(70, 62, 49, 0.2) 100%
-  );
+  background:
+    linear-gradient(
+      to right,
+      rgba(36, 26, 10, 0.72) 0%,
+      rgba(56, 40, 14, 0.38) 45%,
+      rgba(80, 58, 20, 0.12) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(20, 14, 4, 0.15) 0%,
+      transparent 40%,
+      transparent 70%,
+      rgba(10, 7, 2, 0.45) 100%
+    );
 }
 
+/* ── Bottom dark fade for scroll arrow ── */
+.bottomFade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 180px;
+  background: linear-gradient(to bottom, transparent 0%, rgba(8, 5, 2, 0.65) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ── Text content ── */
 .content {
   position: relative;
   z-index: 2;
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  text-align: center;
+  text-align: left;
   padding: 0 var(--container-padding);
   max-width: 700px;
-  margin: 0 auto;
+  margin-left: 6%;
 }
 
 .title {
   font-family: var(--font-heading);
   font-size: var(--text-6xl);
   font-weight: 600;
-  color: var(--color-text-light);
+  color: #fff;
   line-height: 1.1;
   margin-bottom: var(--space-lg);
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
 }
 
 .subtitle {
   font-size: var(--text-lg);
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.88);
   line-height: 1.6;
   margin-bottom: var(--space-2xl);
   max-width: 520px;
+  text-shadow: none;
 }
 
+/* ── CTA button ── */
 .ctaBtn {
-  padding: var(--space-md) var(--space-2xl);
-  font-size: var(--text-base);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.95rem 2.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(198, 154, 93, 0.85) 0%, rgba(129, 96, 64, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  text-decoration: none;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
 }
 
-.arrow {
+.ctaBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, rgba(198, 154, 93, 1) 0%, rgba(129, 96, 64, 1) 100%);
+}
+
+/* ── Scroll-down arrow ── */
+.scrollDown {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  bottom: 2.2rem;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 10;
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  color: var(--color-text-light);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(4px);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition-base);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.arrow:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-50%) scale(1.05);
-}
-
-.arrowLeft {
-  left: var(--space-xl);
-}
-
-.arrowRight {
-  right: var(--space-xl);
-}
-
-.dots {
-  position: absolute;
-  bottom: var(--space-2xl);
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: var(--space-sm);
-  z-index: 10;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.4);
-  transition: all var(--transition-base);
-  border: none;
   cursor: pointer;
+  transition: transform 0.22s ease, background 0.22s ease;
+  animation: bounceDown 2s ease-in-out infinite;
 }
 
-.dot:hover {
-  background: rgba(255, 255, 255, 0.6);
+.scrollDown:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateX(-50%) translateY(-2px);
+  animation: none;
 }
 
-.dotActive {
-  background: var(--color-accent-light);
-  width: 28px;
+@keyframes bounceDown {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
 }
 
+/* ── Responsive ── */
 @media (max-width: 768px) {
   .hero {
-    height: 70vh;
+    height: 85vh;
     min-height: 400px;
+  }
+  .content {
+    margin-left: 4%;
   }
   .title {
     font-size: var(--text-4xl);
@@ -141,10 +161,9 @@
   .subtitle {
     font-size: var(--text-base);
   }
-  .arrow {
-    width: 36px;
-    height: 36px;
+  .scrollDown {
+    width: 42px;
+    height: 42px;
+    bottom: 1.5rem;
   }
-  .arrowLeft { left: var(--space-md); }
-  .arrowRight { right: var(--space-md); }
 }

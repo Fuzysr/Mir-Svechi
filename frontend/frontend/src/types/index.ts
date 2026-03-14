@@ -1,10 +1,16 @@
+export interface WholesaleTier {
+  minQuantity: number;
+  maxQuantity?: number;
+  price: number;
+}
+
 export interface Product {
   id: string;
+  article: string;
   name: string;
   description: string;
   price: number;
-  wholesalePrice?: number;
-  wholesaleMinQuantity?: number;
+  wholesaleTiers: WholesaleTier[];
   images: string[];
   category: string;
   categoryId: string;
@@ -17,8 +23,6 @@ export interface Product {
   inStock: boolean;
   isHit: boolean;
   isNew: boolean;
-  rating: number;
-  reviewsCount: number;
   createdAt: string;
 }
 
@@ -40,7 +44,6 @@ export interface Category {
 export interface CartItem {
   product: Product;
   quantity: number;
-  isWholesale: boolean;
 }
 
 export interface User {

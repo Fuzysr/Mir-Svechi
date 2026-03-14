@@ -6,7 +6,7 @@ import HitsSection from './components/HitsSection';
 import AdvantagesSection from './components/AdvantagesSection';
 
 interface HomeProps {
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, quantity: number) => void;
 }
 
 const Home = memo(function Home({ onAddToCart }: HomeProps) {

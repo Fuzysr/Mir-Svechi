@@ -118,6 +118,12 @@
   gap: var(--space-md);
 }
 
+.article {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
 .category {
   font-size: var(--text-xs);
   text-transform: uppercase;
@@ -132,27 +138,6 @@
   font-weight: 500;
   color: var(--color-secondary);
   line-height: 1.2;
-}
-
-.rating {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.starIcon {
-  color: var(--color-warning);
-  fill: var(--color-warning);
-}
-
-.ratingValue {
-  font-weight: 600;
-  font-size: var(--text-base);
-}
-
-.reviewsCount {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
 }
 
 .description {
@@ -217,48 +202,39 @@
   border-radius: var(--radius-md);
 }
 
-.priceToggle {
-  display: flex;
-  gap: var(--space-xs);
+.priceTitle {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-secondary);
   margin-bottom: var(--space-md);
 }
 
-.priceTab {
-  padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--radius-full);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  transition: all var(--transition-base);
-}
-
-.priceTab:hover {
-  border-color: var(--color-accent);
-}
-
-.priceTabActive {
-  background: var(--color-primary);
-  color: var(--color-text-light);
-  border-color: var(--color-primary);
-}
-
-.priceDisplay {
+.tiersTable {
   display: flex;
-  align-items: baseline;
-  gap: var(--space-md);
+  flex-direction: column;
+  gap: var(--space-xs);
 }
 
-.currentPrice {
-  font-size: var(--text-3xl);
+.tierRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-xs) 0;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: var(--text-sm);
+}
+
+.tierRow:last-child {
+  border-bottom: none;
+}
+
+.tierRange {
+  color: var(--color-text-secondary);
+}
+
+.tierPrice {
   font-weight: 700;
   color: var(--color-secondary);
-}
-
-.minQty {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
 }
 
 .addToCart {

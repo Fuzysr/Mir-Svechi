@@ -1,18 +1,29 @@
-import { memo, useState } from 'react';
+import { memo, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { FiShoppingCart, FiHeart, FiStar } from 'react-icons/fi';
+import { FiShoppingCart, FiHeart, FiMinus, FiPlus } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import type { Product } from '../../types';
 import styles from './ProductCard.module.css';
 
 interface ProductCardProps {
   product: Product;
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, quantity: number) => void;
+}
+
+function formatTierRange(tier: Product['wholesaleTiers'][number]): string {
+  if (tier.maxQuantity) {
+    return `${tier.minQuantity}–${tier.maxQuantity} шт.`;
+  }
+  return `от ${tier.minQuantity} шт.`;
 }
 
 const ProductCard = memo(function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+
+  const decrement = useCallback(() => setQuantity(q => Math.max(1, q - 1)), []);
+  const increment = useCallback(() => setQuantity(q => q + 1), []);
 
   return (
     <motion.div
@@ -45,30 +56,38 @@ const ProductCard = memo(function ProductCard({ product, onAddToCart }: ProductC
       </Link>
 
       <div className={styles.content}>
-        <span className={styles.category}>{product.category}</span>
+        <span className={styles.article}>Арт: {product.article}</span>
         <Link to={`/product/${product.id}`} className={styles.name}>
           {product.name}
         </Link>
 
-        <div className={styles.rating}>
-          <FiStar size={13} className={styles.starIcon} />
-          <span className={styles.ratingValue}>{product.rating}</span>
-          <span className={styles.reviewsCount}>({product.reviewsCount})</span>
-        </div>
+        {product.wholesaleTiers.length > 0 && (
+          <div className={styles.tiers}>
+            {product.wholesaleTiers.map((tier, i) => (
+              <div key={i} className={styles.tierRow}>
+                <span className={styles.tierRange}>{formatTierRange(tier)}</span>
+                <span className={styles.tierPrice}>{tier.price} &#8381;/шт.</span>
+              </div>
+            ))}
+          </div>
+        )}
 
-        <div className={styles.priceRow}>
-          <div className={styles.prices}>
-            <span className={styles.price}>{product.price} &#8381;</span>
-            {product.wholesalePrice && (
-              <span className={styles.wholesalePrice}>опт от {product.wholesalePrice} &#8381;</span>
-            )}
+        <div className={styles.cartRow}>
+          <div className={styles.quantityControl}>
+            <button onClick={decrement} aria-label="Уменьшить">
+              <FiMinus size={14} />
+            </button>
+            <span>{quantity}</span>
+            <button onClick={increment} aria-label="Увеличить">
+              <FiPlus size={14} />
+            </button>
           </div>
           <button
             className={styles.addToCartBtn}
-            onClick={() => onAddToCart(product)}
-            aria-label="Добавить в корзину"
+            onClick={() => onAddToCart(product, quantity)}
           >
             <FiShoppingCart size={16} />
+            В корзину
           </button>
         </div>
       </div>

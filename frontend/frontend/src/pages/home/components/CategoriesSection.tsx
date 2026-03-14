@@ -6,7 +6,7 @@ import styles from './CategoriesSection.module.css';
 
 const CategoriesSection = memo(function CategoriesSection() {
   return (
-    <section className={`section ${styles.section}`}>
+    <section id="categories" className={`section ${styles.section}`}>
       <div className="container">
         <h2 className="section-title">Категории</h2>
         <div className={styles.grid}>

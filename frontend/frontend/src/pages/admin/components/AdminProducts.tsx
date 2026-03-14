@@ -41,7 +41,9 @@ const AdminProducts = memo(function AdminProducts() {
               <td style={{ color: 'var(--color-text-muted)' }}>{product.category}</td>
               <td style={{ fontWeight: 600 }}>{product.price} &#8381;</td>
               <td style={{ color: 'var(--color-accent)' }}>
-                {product.wholesalePrice ? `${product.wholesalePrice} ₽` : '—'}
+                {product.wholesaleTiers.length > 0
+                  ? `от ${product.wholesaleTiers[product.wholesaleTiers.length - 1].price} ₽`
+                  : '—'}
               </td>
               <td>
                 <span className={`${styles.statusBadge} ${product.inStock ? styles.statusApproved : styles.statusRejected}`}>
