@@ -1,6 +1,7 @@
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { products } from '../../../services/mockData';
+import { apiGetProducts } from '../../../services/api';
+import { mapProduct } from '../../../services/mappers';
 import ProductCard from '../../../components/ProductCard/ProductCard';
 import type { Product } from '../../../types';
 import styles from './HitsSection.module.css';
@@ -10,7 +11,13 @@ interface HitsSectionProps {
 }
 
 const HitsSection = memo(function HitsSection({ onAddToCart }: HitsSectionProps) {
-  const hits = products.filter(p => p.isHit).slice(0, 4);
+  const [hits, setHits] = useState<Product[]>([]);
+
+  useEffect(() => {
+    apiGetProducts({ is_hit: 'true', per_page: '4' })
+      .then(res => setHits(res.items.map(mapProduct)))
+      .catch(() => {});
+  }, []);
 
   return (
     <section className="section">

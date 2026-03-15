@@ -1,8 +1,9 @@
-import { useState, useMemo, memo, useEffect } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiShoppingCart, FiChevronRight, FiMinus, FiPlus, FiPackage, FiClock, FiDroplet, FiWind } from 'react-icons/fi';
-import { products } from '../../services/mockData';
+import { apiGetProduct, apiGetProducts } from '../../services/api';
+import { mapProduct } from '../../services/mappers';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import type { Product } from '../../types';
 import styles from './ProductDetail.module.css';
@@ -22,21 +23,39 @@ const ProductDetail = memo(function ProductDetail({ onAddToCart }: ProductDetail
   const { id } = useParams<{ id: string }>();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-
-  const product = useMemo(() => products.find(p => p.id === id), [id]);
-
-  const similarProducts = useMemo(() => {
-    if (!product) return [];
-    return products
-      .filter(p => p.categoryId === product.categoryId && p.id !== product.id)
-      .slice(0, 4);
-  }, [product]);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!id) return;
+    setLoading(true);
     setSelectedImage(0);
     setQuantity(1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    apiGetProduct(id)
+      .then(data => {
+        const mapped = mapProduct(data);
+        setProduct(mapped);
+        return apiGetProducts({ category_id: mapped.categoryId, per_page: '5' });
+      })
+      .then(res => {
+        setSimilarProducts(res.items.map(mapProduct).filter(p => p.id !== id).slice(0, 4));
+      })
+      .catch(() => setProduct(null))
+      .finally(() => setLoading(false));
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className={styles.notFound}>
+        <div className="container">
+          <h2>Загрузка...</h2>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (

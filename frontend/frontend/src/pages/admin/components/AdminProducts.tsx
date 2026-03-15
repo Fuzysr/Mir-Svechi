@@ -1,10 +1,28 @@
-import { memo, useState } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
-import { products as mockProducts } from '../../../services/mockData';
+import { apiGetProducts, apiDeleteProduct } from '../../../services/api';
+import { mapProduct } from '../../../services/mappers';
+import type { Product } from '../../../types';
 import styles from '../Admin.module.css';
 
 const AdminProducts = memo(function AdminProducts() {
-  const [productsList] = useState(mockProducts);
+  const [productsList, setProductsList] = useState<Product[]>([]);
+
+  const loadProducts = () => {
+    apiGetProducts({ per_page: '100' })
+      .then(res => setProductsList(res.items.map(mapProduct)))
+      .catch(() => {});
+  };
+
+  useEffect(() => { loadProducts(); }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Удалить товар?')) return;
+    try {
+      await apiDeleteProduct(id);
+      loadProducts();
+    } catch {}
+  };
 
   return (
     <div className={styles.adminSection}>
@@ -55,7 +73,7 @@ const AdminProducts = memo(function AdminProducts() {
                   <button className={styles.actionBtn} style={{ color: 'var(--color-primary)', border: '1px solid var(--color-border)' }}>
                     <FiEdit2 size={14} />
                   </button>
-                  <button className={styles.actionBtn} style={{ color: 'var(--color-error)', border: '1px solid var(--color-border)' }}>
+                  <button className={styles.actionBtn} style={{ color: 'var(--color-error)', border: '1px solid var(--color-border)' }} onClick={() => handleDelete(product.id)}>
                     <FiTrash2 size={14} />
                   </button>
                 </div>

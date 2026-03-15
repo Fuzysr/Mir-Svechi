@@ -1,10 +1,20 @@
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { categories } from '../../../services/mockData';
+import { apiGetCategories } from '../../../services/api';
+import { mapCategory } from '../../../services/mappers';
+import type { Category } from '../../../types';
 import styles from './CategoriesSection.module.css';
 
 const CategoriesSection = memo(function CategoriesSection() {
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    apiGetCategories()
+      .then(data => setCategories(data.map(mapCategory)))
+      .catch(() => {});
+  }, []);
+
   return (
     <section id="categories" className={`section ${styles.section}`}>
       <div className="container">

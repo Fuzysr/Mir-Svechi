@@ -1,10 +1,11 @@
-import { useState, useMemo, useCallback, memo, useEffect } from 'react';
+import { useState, useCallback, memo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiFilter, FiX, FiChevronDown } from 'react-icons/fi';
-import { products, categories, availableColors, availableSizes } from '../../services/mockData';
+import { apiGetProducts, apiGetCategories } from '../../services/api';
+import { mapProduct, mapCategory } from '../../services/mappers';
 import ProductCard from '../../components/ProductCard/ProductCard';
-import type { Product } from '../../types';
+import type { Product, Category } from '../../types';
 import styles from './Catalog.module.css';
 
 interface CatalogProps {
@@ -19,9 +20,21 @@ const sortOptions = [
   { value: 'name', label: 'По названию' },
 ];
 
+const availableColors = [
+  'Белый', 'Слоновая кость', 'Кремовый', 'Бежевый', 'Песочный',
+  'Золотой', 'Розовый', 'Пудровый', 'Лавандовый', 'Фиолетовый',
+  'Голубой', 'Синий', 'Бордовый', 'Красный', 'Коричневый',
+  'Серый', 'Натуральный воск', 'Жёлтый', 'Разноцветный',
+];
+
+const availableSizes = ['Мини', 'Тонкая', 'Стандарт', 'Средняя', 'Большая'];
+
 const Catalog = memo(function Catalog({ onAddToCart }: CatalogProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
 
   const activeCategory = searchParams.get('category') || '';
   const activeSearch = searchParams.get('search') || '';
@@ -32,6 +45,34 @@ const Catalog = memo(function Catalog({ onAddToCart }: CatalogProps) {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  useEffect(() => {
+    apiGetCategories()
+      .then(data => setCategories(data.map(mapCategory)))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const params: Record<string, string> = { per_page: '100', sort_by: activeSort };
+    if (activeCategory) params.category_id = activeCategory;
+    if (activeSearch) params.search = activeSearch;
+
+    apiGetProducts(params)
+      .then(res => {
+        let items = res.items.map(mapProduct);
+
+        if (activeColors.length > 0) {
+          items = items.filter(p => p.colors.some(c => activeColors.includes(c)));
+        }
+        if (activeSizes.length > 0) {
+          items = items.filter(p => activeSizes.includes(p.size.label));
+        }
+
+        setFilteredProducts(items);
+        setTotalProducts(items.length);
+      })
+      .catch(() => {});
+  }, [activeCategory, activeSearch, activeSort, activeColors.join(','), activeSizes.join(',')]);
 
   const updateFilter = useCallback((key: string, value: string) => {
     setSearchParams(prev => {
@@ -55,45 +96,6 @@ const Catalog = memo(function Catalog({ onAddToCart }: CatalogProps) {
   const clearFilters = useCallback(() => {
     setSearchParams({});
   }, [setSearchParams]);
-
-  const filteredProducts = useMemo(() => {
-    let result = [...products];
-
-    if (activeCategory) {
-      result = result.filter(p => p.categoryId === activeCategory);
-    }
-    if (activeSearch) {
-      const q = activeSearch.toLowerCase();
-      result = result.filter(p =>
-        p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)
-      );
-    }
-    if (activeColors.length > 0) {
-      result = result.filter(p => p.colors.some(c => activeColors.includes(c)));
-    }
-    if (activeSizes.length > 0) {
-      result = result.filter(p => activeSizes.includes(p.size.label));
-    }
-
-    switch (activeSort) {
-      case 'price-asc':
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        result.sort((a, b) => b.price - a.price);
-        break;
-      case 'name':
-        result.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'new':
-        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        break;
-      default:
-        result.sort((a, b) => Number(b.isHit) - Number(a.isHit));
-    }
-
-    return result;
-  }, [activeCategory, activeSearch, activeColors, activeSizes, activeSort]);
 
   const hasFilters = activeCategory || activeColors.length > 0 || activeSizes.length > 0 || activeSearch;
   const activeCategoryName = categories.find(c => c.id === activeCategory)?.name;

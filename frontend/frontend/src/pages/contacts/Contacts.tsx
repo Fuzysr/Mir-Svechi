@@ -1,11 +1,33 @@
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiPhone, FiMail, FiMapPin, FiClock } from 'react-icons/fi';
 import { FaTelegramPlane, FaWhatsapp, FaVk } from 'react-icons/fa';
-import { contactInfo } from '../../services/mockData';
+import { apiGetContacts } from '../../services/api';
+import type { ContactInfo } from '../../types';
 import styles from './Contacts.module.css';
 
+const defaultContact: ContactInfo = {
+  phone: '', email: '', address: '', workingHours: '',
+  socialLinks: {},
+};
+
 const Contacts = memo(function Contacts() {
+  const [contactInfo, setContactInfo] = useState<ContactInfo>(defaultContact);
+
+  useEffect(() => {
+    apiGetContacts().then(data => {
+      if (data) {
+        setContactInfo({
+          phone: data.phone,
+          email: data.email,
+          address: data.address,
+          workingHours: data.working_hours,
+          socialLinks: data.social_links || {},
+        });
+      }
+    }).catch(() => {});
+  }, []);
+
   return (
     <div className={styles.page}>
       <div className="container">

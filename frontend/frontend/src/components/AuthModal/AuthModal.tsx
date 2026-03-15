@@ -6,8 +6,8 @@ import styles from './AuthModal.module.css';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogin: (email: string, password: string) => void;
-  onRegister: (name: string, email: string, phone: string, password: string) => void;
+  onLogin: (email: string, password: string) => Promise<any>;
+  onRegister: (name: string, email: string, phone: string, password: string) => Promise<any>;
 }
 
 const AuthModal = memo(function AuthModal({ isOpen, onClose, onLogin, onRegister }: AuthModalProps) {
@@ -19,7 +19,9 @@ const AuthModal = memo(function AuthModal({ isOpen, onClose, onLogin, onRegister
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -28,22 +30,32 @@ const AuthModal = memo(function AuthModal({ isOpen, onClose, onLogin, onRegister
       return;
     }
 
-    if (isLoginMode) {
-      onLogin(email, password);
-    } else {
-      if (!name || !phone) {
-        setError('Заполните все обязательные поля');
-        return;
+    setLoading(true);
+    try {
+      if (isLoginMode) {
+        await onLogin(email, password);
+      } else {
+        if (!name || !phone) {
+          setError('Заполните все обязательные поля');
+          setLoading(false);
+          return;
+        }
+        if (password !== confirmPassword) {
+          setError('Пароли не совпадают');
+          setLoading(false);
+          return;
+        }
+        if (password.length < 6) {
+          setError('Пароль должен быть не менее 6 символов');
+          setLoading(false);
+          return;
+        }
+        await onRegister(name, email, phone, password);
       }
-      if (password !== confirmPassword) {
-        setError('Пароли не совпадают');
-        return;
-      }
-      if (password.length < 6) {
-        setError('Пароль должен быть не менее 6 символов');
-        return;
-      }
-      onRegister(name, email, phone, password);
+    } catch (err: any) {
+      setError(err.message || 'Произошла ошибка');
+    } finally {
+      setLoading(false);
     }
   }, [isLoginMode, name, email, phone, password, confirmPassword, onLogin, onRegister]);
 
@@ -150,8 +162,8 @@ const AuthModal = memo(function AuthModal({ isOpen, onClose, onLogin, onRegister
 
               {error && <p className={styles.error}>{error}</p>}
 
-              <button type="submit" className={`btn btn-primary ${styles.submitBtn}`}>
-                {isLoginMode ? 'Войти' : 'Зарегистрироваться'}
+              <button type="submit" className={`btn btn-primary ${styles.submitBtn}`} disabled={loading}>
+                {loading ? 'Загрузка...' : (isLoginMode ? 'Войти' : 'Зарегистрироваться')}
               </button>
             </form>
 

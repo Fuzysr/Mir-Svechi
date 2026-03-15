@@ -1,12 +1,33 @@
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiChevronDown } from 'react-icons/fi';
-import { heroSlides } from '../../../services/mockData';
+import { apiGetSlides } from '../../../services/api';
+import mianBgImage from '../../../assets/images/mianBg2.jpg';
 import styles from './HeroSlider.module.css';
 
 const HeroSlider = memo(function HeroSlider() {
-  const slide = heroSlides[0];
+  const [slide, setSlide] = useState<any>(null);
+
+  useEffect(() => {
+    apiGetSlides().then(slides => {
+      if (slides.length > 0) setSlide(slides[0]);
+    }).catch(() => {});
+  }, []);
+
+  if (!slide) {
+    return (
+      <section className={styles.hero}>
+        <div className={styles.slide}>
+          <div className={styles.imageBg}>
+            <img src={mianBgImage} alt="" className={styles.bgImage} />
+            <div className={styles.overlay} />
+            <div className={styles.bottomFade} />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   const scrollToCategories = () => {
     document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' });
@@ -16,7 +37,7 @@ const HeroSlider = memo(function HeroSlider() {
     <section className={styles.hero}>
       <div className={styles.slide}>
         <div className={styles.imageBg}>
-          <img src={slide.image} alt="" className={styles.bgImage} />
+          <img src={slide.image || mianBgImage} alt="" className={styles.bgImage} />
           <div className={styles.overlay} />
           <div className={styles.bottomFade} />
         </div>

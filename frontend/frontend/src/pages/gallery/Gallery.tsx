@@ -1,22 +1,28 @@
-import { useState, useMemo, memo } from 'react';
+import { useState, useMemo, memo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX } from 'react-icons/fi';
-import { galleryImages } from '../../services/mockData';
+import { apiGetGallery } from '../../services/api';
+import type { GalleryImage } from '../../types';
 import styles from './Gallery.module.css';
 
 const Gallery = memo(function Gallery() {
   const [activeFilter, setActiveFilter] = useState('Все');
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+
+  useEffect(() => {
+    apiGetGallery().then(data => setGalleryImages(data)).catch(() => {});
+  }, []);
 
   const filterCategories = useMemo(() => {
     const cats = new Set(galleryImages.map(img => img.category));
     return ['Все', ...Array.from(cats)];
-  }, []);
+  }, [galleryImages]);
 
   const filteredImages = useMemo(() => {
     if (activeFilter === 'Все') return galleryImages;
     return galleryImages.filter(img => img.category === activeFilter);
-  }, [activeFilter]);
+  }, [activeFilter, galleryImages]);
 
   return (
     <div className={styles.page}>

@@ -1,7 +1,8 @@
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiFeather, FiTruck, FiUsers, FiAward } from 'react-icons/fi';
-import { advantages } from '../../../services/mockData';
+import { apiGetAdvantages } from '../../../services/api';
+import type { Advantage } from '../../../types';
 import styles from './AdvantagesSection.module.css';
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -12,6 +13,14 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 const AdvantagesSection = memo(function AdvantagesSection() {
+  const [advantages, setAdvantages] = useState<Advantage[]>([]);
+
+  useEffect(() => {
+    apiGetAdvantages()
+      .then(data => setAdvantages(data))
+      .catch(() => {});
+  }, []);
+
   return (
     <section className={`section ${styles.section}`}>
       <div className="container">

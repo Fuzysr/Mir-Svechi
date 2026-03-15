@@ -1,11 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { User } from '../types';
+import { apiLogin, apiRegister, apiGetMe, saveTokens, clearTokens, getAccessToken } from '../services/api';
 
-const AUTH_KEY = 'mir-svechi-auth';
+const USER_KEY = 'mir-svechi-auth';
 
-function loadUser(): User | null {
+function loadCachedUser(): User | null {
   try {
-    const saved = localStorage.getItem(AUTH_KEY);
+    const saved = localStorage.getItem(USER_KEY);
     return saved ? JSON.parse(saved) : null;
   } catch {
     return null;
@@ -13,41 +14,71 @@ function loadUser(): User | null {
 }
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(loadUser);
+  const [user, setUser] = useState<User | null>(loadCachedUser);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  const login = useCallback((email: string, _password: string) => {
-    const mockUser: User = {
-      id: 'user-1',
-      email,
-      name: email.split('@')[0],
-      phone: '+7 (900) 000-00-00',
-      role: email === 'admin@mirsvchi.ru' ? 'admin' : 'user',
-      createdAt: new Date().toISOString(),
-    };
-    localStorage.setItem(AUTH_KEY, JSON.stringify(mockUser));
-    setUser(mockUser);
-    setShowAuthModal(false);
-    return mockUser;
+  useEffect(() => {
+    const token = getAccessToken();
+    if (token && !user) {
+      apiGetMe()
+        .then((u) => {
+          const mapped: User = {
+            id: u.id,
+            email: u.email,
+            name: u.name,
+            phone: u.phone,
+            role: u.role,
+            createdAt: u.created_at,
+          };
+          localStorage.setItem(USER_KEY, JSON.stringify(mapped));
+          setUser(mapped);
+        })
+        .catch(() => {
+          clearTokens();
+          localStorage.removeItem(USER_KEY);
+        });
+    }
   }, []);
 
-  const register = useCallback((name: string, email: string, phone: string, _password: string) => {
-    const mockUser: User = {
-      id: 'user-' + Date.now(),
-      email,
-      name,
-      phone,
-      role: 'user',
-      createdAt: new Date().toISOString(),
+  const login = useCallback(async (email: string, password: string) => {
+    const tokens = await apiLogin(email, password);
+    saveTokens(tokens.access_token, tokens.refresh_token);
+    const u = await apiGetMe();
+    const mapped: User = {
+      id: u.id,
+      email: u.email,
+      name: u.name,
+      phone: u.phone,
+      role: u.role,
+      createdAt: u.created_at,
     };
-    localStorage.setItem(AUTH_KEY, JSON.stringify(mockUser));
-    setUser(mockUser);
+    localStorage.setItem(USER_KEY, JSON.stringify(mapped));
+    setUser(mapped);
     setShowAuthModal(false);
-    return mockUser;
+    return mapped;
+  }, []);
+
+  const register = useCallback(async (name: string, email: string, phone: string, password: string) => {
+    const tokens = await apiRegister(name, email, phone, password);
+    saveTokens(tokens.access_token, tokens.refresh_token);
+    const u = await apiGetMe();
+    const mapped: User = {
+      id: u.id,
+      email: u.email,
+      name: u.name,
+      phone: u.phone,
+      role: u.role,
+      createdAt: u.created_at,
+    };
+    localStorage.setItem(USER_KEY, JSON.stringify(mapped));
+    setUser(mapped);
+    setShowAuthModal(false);
+    return mapped;
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem(AUTH_KEY);
+    clearTokens();
+    localStorage.removeItem(USER_KEY);
     setUser(null);
   }, []);
 

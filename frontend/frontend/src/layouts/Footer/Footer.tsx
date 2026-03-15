@@ -1,12 +1,31 @@
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiPhone, FiMail, FiMapPin, FiClock } from 'react-icons/fi';
 import { FaTelegramPlane, FaWhatsapp, FaVk } from 'react-icons/fa';
 import logo from '../../assets/logo.svg';
-import { contactInfo } from '../../services/mockData';
+import { apiGetContacts } from '../../services/api';
+import type { ContactInfo } from '../../types';
 import styles from './Footer.module.css';
 
 const Footer = memo(function Footer() {
+  const [contactInfo, setContactInfo] = useState<ContactInfo>({
+    phone: '', email: '', address: '', workingHours: '', socialLinks: {},
+  });
+
+  useEffect(() => {
+    apiGetContacts().then(data => {
+      if (data) {
+        setContactInfo({
+          phone: data.phone,
+          email: data.email,
+          address: data.address,
+          workingHours: data.working_hours,
+          socialLinks: data.social_links || {},
+        });
+      }
+    }).catch(() => {});
+  }, []);
+
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
