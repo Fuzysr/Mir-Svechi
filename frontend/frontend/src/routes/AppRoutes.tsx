@@ -29,6 +29,7 @@ interface AppRoutesProps {
   onRemoveItem: (productId: string) => void;
   onClearCart: () => void;
   onAuthClick: () => void;
+  onLogout: () => void;
 }
 
 export default function AppRoutes({
@@ -40,6 +41,7 @@ export default function AppRoutes({
   onRemoveItem,
   onClearCart,
   onAuthClick,
+  onLogout,
 }: AppRoutesProps) {
   return (
     <Routes>
@@ -72,7 +74,7 @@ export default function AppRoutes({
         <Route path="files" element={<Files />} />
       </Route>
 
-      <Route path="/admin" element={<Admin user={user} />}>
+      <Route path="/admin" element={<Admin user={user} onLogout={onLogout} />}>
         <Route index element={<Navigate to="orders" replace />} />
         <Route path="orders" element={<AdminOrders />} />
         <Route path="products" element={<AdminProducts />} />

@@ -1,11 +1,12 @@
 import { memo } from 'react';
-import { NavLink, Outlet, Navigate } from 'react-router-dom';
-import { FiPackage, FiShoppingBag, FiUsers, FiGrid, FiSettings } from 'react-icons/fi';
+import { NavLink, Outlet, Navigate, useNavigate } from 'react-router-dom';
+import { FiPackage, FiShoppingBag, FiUsers, FiGrid, FiSettings, FiLogOut } from 'react-icons/fi';
 import type { User } from '../../types';
 import styles from './Admin.module.css';
 
 interface AdminProps {
   user: User | null;
+  onLogout: () => void;
 }
 
 const sidebarLinks = [
@@ -16,10 +17,17 @@ const sidebarLinks = [
   { to: '/admin/settings', icon: <FiSettings size={18} />, label: 'Настройки' },
 ];
 
-const Admin = memo(function Admin({ user }: AdminProps) {
+const Admin = memo(function Admin({ user, onLogout }: AdminProps) {
+  const navigate = useNavigate();
+
   if (!user || user.role !== 'admin') {
     return <Navigate to="/" replace />;
   }
+
+  const handleLogout = () => {
+    onLogout();
+    navigate('/');
+  };
 
   return (
     <div className={styles.page}>
@@ -40,6 +48,10 @@ const Admin = memo(function Admin({ user }: AdminProps) {
             </NavLink>
           ))}
         </nav>
+        <button className={styles.logoutBtn} onClick={handleLogout}>
+          <FiLogOut size={18} />
+          <span>Выйти</span>
+        </button>
       </aside>
 
       <main className={styles.main}>

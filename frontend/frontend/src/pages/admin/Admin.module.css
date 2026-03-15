@@ -203,6 +203,217 @@
   object-fit: cover;
 }
 
+/* ── Modal ─────────────────────────────────────────── */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-xl);
+}
+
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-xl) var(--space-2xl);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.modalTitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  color: var(--color-secondary);
+}
+
+.modalCloseBtn {
+  padding: var(--space-xs);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.modalCloseBtn:hover {
+  color: var(--color-text);
+  background: var(--color-bg-secondary);
+}
+
+.modalBody {
+  padding: var(--space-xl) var(--space-2xl);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.formFieldFull {
+  grid-column: 1 / -1;
+}
+
+.formLabel {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.formInput {
+  padding: var(--space-md) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  background: var(--color-bg);
+  transition: border-color var(--transition-base);
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.formTextarea {
+  composes: formInput;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.formSelect {
+  composes: formInput;
+  cursor: pointer;
+}
+
+.formCheckboxRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.formCheckbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.formCheckbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-2xl);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.btnCancel {
+  padding: var(--space-md) var(--space-xl);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.btnCancel:hover {
+  background: var(--color-bg-secondary);
+}
+
+.formError {
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  padding: var(--space-md) var(--space-2xl);
+}
+
+/* ── Wholesale Tiers ──────────────────────────────── */
+
+.tierRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: var(--space-sm);
+  align-items: end;
+}
+
+.tierRemoveBtn {
+  padding: var(--space-sm);
+  color: var(--color-error);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.tierRemoveBtn:hover {
+  background: rgba(196, 112, 112, 0.1);
+}
+
+.addTierBtn {
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  font-weight: 500;
+  padding: var(--space-sm) 0;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.addTierBtn:hover {
+  text-decoration: underline;
+}
+
+/* ── Logout button ────────────────────────────────── */
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-error);
+  width: 100%;
+  transition: all var(--transition-base);
+  margin-top: auto;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.logoutBtn:hover {
+  background: rgba(196, 112, 112, 0.1);
+}
+
 @media (max-width: 1024px) {
   .page {
     flex-direction: column;

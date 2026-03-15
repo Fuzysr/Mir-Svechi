@@ -3,10 +3,13 @@ import { FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
 import { apiGetCategories, apiDeleteCategory } from '../../../services/api';
 import { mapCategory } from '../../../services/mappers';
 import type { Category } from '../../../types';
+import CategoryFormModal from './CategoryFormModal';
 import styles from '../Admin.module.css';
 
 const AdminCategories = memo(function AdminCategories() {
   const [categoriesList, setCategoriesList] = useState<Category[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
   const loadCategories = () => {
     apiGetCategories()
@@ -24,6 +27,22 @@ const AdminCategories = memo(function AdminCategories() {
     } catch {}
   };
 
+  const handleAdd = () => {
+    setEditingCategory(null);
+    setShowModal(true);
+  };
+
+  const handleEdit = (cat: Category) => {
+    setEditingCategory(cat);
+    setShowModal(true);
+  };
+
+  const handleSaved = () => {
+    setShowModal(false);
+    setEditingCategory(null);
+    loadCategories();
+  };
+
   return (
     <div className={styles.adminSection}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2xl)' }}>
@@ -31,7 +50,7 @@ const AdminCategories = memo(function AdminCategories() {
           <h2 className={styles.adminTitle}>Категории</h2>
           <p className={styles.adminSubtitle}>Управление категориями товаров</p>
         </div>
-        <button className="btn btn-primary" style={{ gap: '8px' }}>
+        <button className="btn btn-primary" style={{ gap: '8px' }} onClick={handleAdd}>
           <FiPlus size={16} />
           Добавить категорию
         </button>
@@ -58,7 +77,7 @@ const AdminCategories = memo(function AdminCategories() {
               <td style={{ fontWeight: 600 }}>{cat.productCount}</td>
               <td>
                 <div className={styles.actionBtns}>
-                  <button className={styles.actionBtn} style={{ color: 'var(--color-primary)', border: '1px solid var(--color-border)' }}>
+                  <button className={styles.actionBtn} style={{ color: 'var(--color-primary)', border: '1px solid var(--color-border)' }} onClick={() => handleEdit(cat)}>
                     <FiEdit2 size={14} />
                   </button>
                   <button className={styles.actionBtn} style={{ color: 'var(--color-error)', border: '1px solid var(--color-border)' }} onClick={() => handleDelete(cat.id)}>
@@ -70,6 +89,14 @@ const AdminCategories = memo(function AdminCategories() {
           ))}
         </tbody>
       </table>
+
+      {showModal && (
+        <CategoryFormModal
+          category={editingCategory}
+          onClose={() => { setShowModal(false); setEditingCategory(null); }}
+          onSaved={handleSaved}
+        />
+      )}
     </div>
   );
 });

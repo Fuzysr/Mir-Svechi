@@ -64,6 +64,7 @@ function AppContent() {
           onRemoveItem={removeItem}
           onClearCart={clearCart}
           onAuthClick={openAuthModal}
+          onLogout={logout}
         />
       </main>
 

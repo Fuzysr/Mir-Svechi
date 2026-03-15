@@ -3,10 +3,13 @@ import { FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
 import { apiGetProducts, apiDeleteProduct } from '../../../services/api';
 import { mapProduct } from '../../../services/mappers';
 import type { Product } from '../../../types';
+import ProductFormModal from './ProductFormModal';
 import styles from '../Admin.module.css';
 
 const AdminProducts = memo(function AdminProducts() {
   const [productsList, setProductsList] = useState<Product[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const loadProducts = () => {
     apiGetProducts({ per_page: '100' })
@@ -24,6 +27,22 @@ const AdminProducts = memo(function AdminProducts() {
     } catch {}
   };
 
+  const handleAdd = () => {
+    setEditingProduct(null);
+    setShowModal(true);
+  };
+
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product);
+    setShowModal(true);
+  };
+
+  const handleSaved = () => {
+    setShowModal(false);
+    setEditingProduct(null);
+    loadProducts();
+  };
+
   return (
     <div className={styles.adminSection}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2xl)' }}>
@@ -31,7 +50,7 @@ const AdminProducts = memo(function AdminProducts() {
           <h2 className={styles.adminTitle}>Товары</h2>
           <p className={styles.adminSubtitle}>Управление каталогом товаров</p>
         </div>
-        <button className="btn btn-primary" style={{ gap: '8px' }}>
+        <button className="btn btn-primary" style={{ gap: '8px' }} onClick={handleAdd}>
           <FiPlus size={16} />
           Добавить товар
         </button>
@@ -70,7 +89,7 @@ const AdminProducts = memo(function AdminProducts() {
               </td>
               <td>
                 <div className={styles.actionBtns}>
-                  <button className={styles.actionBtn} style={{ color: 'var(--color-primary)', border: '1px solid var(--color-border)' }}>
+                  <button className={styles.actionBtn} style={{ color: 'var(--color-primary)', border: '1px solid var(--color-border)' }} onClick={() => handleEdit(product)}>
                     <FiEdit2 size={14} />
                   </button>
                   <button className={styles.actionBtn} style={{ color: 'var(--color-error)', border: '1px solid var(--color-border)' }} onClick={() => handleDelete(product.id)}>
@@ -82,6 +101,13 @@ const AdminProducts = memo(function AdminProducts() {
           ))}
         </tbody>
       </table>
+      {showModal && (
+        <ProductFormModal
+          product={editingProduct}
+          onClose={() => { setShowModal(false); setEditingProduct(null); }}
+          onSaved={handleSaved}
+        />
+      )}
     </div>
   );
 });
